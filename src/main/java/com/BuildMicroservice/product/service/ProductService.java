@@ -1,6 +1,7 @@
 package com.BuildMicroservice.product.service;
 
 import com.BuildMicroservice.product.dto.ProductRequest;
+import com.BuildMicroservice.product.dto.ProductResponse;
 import com.BuildMicroservice.product.model.Product;
 import com.BuildMicroservice.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class ProductService {
     // going to inject the product repository interface
     private final ProductRepository productRepository;
 
-    public Product createProduct(ProductRequest productRequest) {
+    public ProductResponse createProduct(ProductRequest productRequest) {
         // Create product
         // Create a new product object
         Product product = Product.builder()
@@ -29,15 +30,20 @@ public class ProductService {
         productRepository.save(product);
         log.info("Product created successfully");
         // now  we have to return the product object that we have created
-        return product;
+        return new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice());
+
 
     }
     // wait instead of returning the product class which is a model class we can create another DTO class called as ProductResponse we will map
     //the product object to the ProductResponse object and return the ProductResponse object
 
 
-    public List<Product> getAllProducts() {
+    public List<ProductResponse> getAllProducts() {
         // Get all products
-        return productRepository.findAll();
+        return productRepository.findAll()
+        //map this list of product objects to a list of productResponse objects
+        .stream()
+        .map(product -> new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice())).toList();
+        // and here we use .toList so that we can get the list of productResponse objects as a return type.
     }
 }
